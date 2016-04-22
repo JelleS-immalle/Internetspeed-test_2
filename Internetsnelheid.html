@@ -1,0 +1,164 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+#progress{
+    font-family: Consolas;
+    opacity: 0.7;
+    padding: 25px;
+    transition: 3s;
+}
+#progressDiv{
+    border-radius: 60px;
+    border: double 4px gray;
+    position: fixed;
+    text-align: center;
+    transition: 3s;
+}
+.spinner {
+  margin: 100px auto;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  text-align: center;
+  
+  -webkit-animation: sk-rotate 2.0s infinite linear;
+  animation: sk-rotate 2.0s infinite linear;
+}
+
+.dot1, .dot2 {
+  width: 60%;
+  height: 60%;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  background-color: #333;
+  border-radius: 100%;
+  
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.dot2 {
+  top: auto;
+  bottom: 0;
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes sk-rotate { 100% { -webkit-transform: rotate(360deg) }}
+@keyframes sk-rotate { 100% { transform: rotate(360deg); -webkit-transform: rotate(360deg) }}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bounce {
+  0%, 100% { 
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% { 
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+    </style>
+    <title></title>
+	<meta charset="utf-8" />
+</head>
+<body>
+    <script>
+        var OSName = "Unknown OS";
+        if (navigator.appVersion.indexOf("Win") != -1) OSName = "Windows";
+        if (navigator.appVersion.indexOf("Mac") != -1) OSName = "MacOS";
+        if (navigator.appVersion.indexOf("X11") != -1) OSName = "UNIX";
+        if (navigator.appVersion.indexOf("Linux") != -1) OSName = "Linux";
+
+        console.log('Your OS: ' + OSName);
+        console.log(navigator.plugins);
+
+        var imageAddr = "http://www.kenrockwell.com/contax/images/g2/examples/31120037-5mb.jpg";
+        var downloadSize = 4995374; //bytes
+
+        function ShowProgressMessage(msg) {
+            if (console) {
+                if (typeof msg == "string") {
+                    console.log(msg);
+                } else {
+                    for (var i = 0; i < msg.length; i++) {
+                        console.log(msg[i]);
+                    }
+                }
+            }
+
+            var oProgress = document.getElementById("progress");
+            if (oProgress) {
+                var actualHTML = (typeof msg == "string") ? msg : msg.join("<br />");
+                oProgress.innerHTML = actualHTML;
+            }
+        }
+
+        function InitiateSpeedDetection() {
+            ShowProgressMessage("Loading the image, please wait...");
+            window.setTimeout(MeasureConnectionSpeed, 1);
+        };
+
+        if (window.addEventListener) {
+            window.addEventListener('load', InitiateSpeedDetection, false);
+        } else if (window.attachEvent) {
+            window.attachEvent('onload', InitiateSpeedDetection);
+        }
+
+        function MeasureConnectionSpeed() {
+            var startTime, endTime;
+            var download = new Image();
+            download.onload = function () {
+                endTime = (new Date()).getTime();
+                showResults();
+            }
+
+            download.onerror = function (err, msg) {
+                ShowProgressMessage("Invalid image, or error downloading");
+            }
+
+            startTime = (new Date()).getTime();
+            var cacheBuster = "?nnn=" + startTime;
+            download.src = imageAddr + cacheBuster;
+
+            var test;
+
+            function showResults() {
+                var duration = (endTime - startTime) / 1000;
+                var bitsLoaded = downloadSize * 8;
+                var speedBps = (bitsLoaded / duration).toFixed(2);
+                var speedKbps = (speedBps / 1024).toFixed(2);
+                var speedMbps = (speedKbps / 1024).toFixed(2);
+                var test = false;
+
+                var dot1 = document.getElementsByClassName("dot1");
+                var dot2 = document.getElementsByClassName("dot2");
+
+                dot1.style.visibility = "hidden";
+                dot2.style.visibility = "hidden";
+
+                ShowProgressMessage([
+                    "Your connection speed is:",
+                    speedKbps + " kbps",
+                    speedMbps + " Mbps"
+                ]);
+            }
+        }
+    </script>
+    <div id="progressDiv">
+        <p id="progress">JavaScript is turned off, or your browser is realy slow</p>
+        <div class="spinner">
+            <div class="dot1"></div>
+            <div class="dot2"></div>
+        </div>
+    </div>
+    <div id="footer">
+
+    </div>
+</body>
+</html>
